@@ -24,6 +24,7 @@
             dgvTarget = new DataGridView();
             label1 = new Label();
             label2 = new Label();
+            label3 = new Label();
             ((System.ComponentModel.ISupportInitialize)dgvMyBoard).BeginInit();
             ((System.ComponentModel.ISupportInitialize)dgvTarget).BeginInit();
             SuspendLayout();
@@ -109,22 +110,34 @@
             label1.AutoSize = true;
             label1.Location = new Point(41, 460);
             label1.Name = "label1";
-            label1.Size = new Size(61, 15);
+            label1.Size = new Size(46, 15);
             label1.TabIndex = 10;
-            label1.Text = "cách chơi ";
+            label1.Text = "Lưu Ý : ";
+            label1.Click += label1_Click;
             // 
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new Point(41, 484);
+            label2.Location = new Point(41, 475);
             label2.Name = "label2";
             label2.Size = new Size(331, 15);
             label2.TabIndex = 11;
             label2.Text = "Trước khi đặt tàu nhấn R để quy định tàu xoay ngang hay dọc";
             // 
+            // label3
+            // 
+            label3.AutoSize = true;
+            label3.Location = new Point(41, 490);
+            label3.Name = "label3";
+            label3.Size = new Size(295, 15);
+            label3.TabIndex = 12;
+            label3.Text = "Sau khi đặt đủ 5 tàu sẽ khoá lại và không thể chỉnh sửa";
+            label3.Click += label3_Click;
+            // 
             // Form1
             // 
             ClientSize = new Size(770, 531);
+            Controls.Add(label3);
             Controls.Add(label2);
             Controls.Add(label1);
             Controls.Add(dgvTarget);
@@ -156,5 +169,6 @@
         private Button btnPlaceShips;
         private Label label1;
         private Label label2;
+        private Label label3;
     }
 }

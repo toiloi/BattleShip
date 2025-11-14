@@ -31,6 +31,8 @@ namespace BattleshipClientWin
             this.KeyPreview = true;        // để nhận phím R
             this.KeyDown += Form1_KeyDown; // nghe nút xoay
             dgvMyBoard.CellClick += dgvMyBoard_CellClick;
+            dgvMyBoard.MouseDown += dgvMyBoard_MouseDown;
+
         }
 
         private void InitGrids()
@@ -95,7 +97,7 @@ namespace BattleshipClientWin
                 foreach (DataGridViewCell c in r.Cells)
                     c.Style.BackColor = Color.White;
         }
-     
+
         private void Form1_KeyDown(object? sender, KeyEventArgs e)
         {
             if (!_placingShips) return;
@@ -122,9 +124,11 @@ namespace BattleshipClientWin
             }
 
             // đặt tàu
-            var ship = new Ship(len, x, y, _shipDir);
+            // colorIndex = thứ tự tàu đang đặt
+            var ship = new Ship(len, x, y, _shipDir, _currentShipIndex);
             _myShips.Add(ship);
-            DrawShip(ship, Color.LightBlue);
+            DrawShip(ship);
+
 
             _currentShipIndex++;
 
@@ -135,12 +139,72 @@ namespace BattleshipClientWin
 
                 // gửi lên server
                 _ = SendAsync(new { type = "PLACE_SHIPS", ships = _myShips });
-                btnPlaceShips.Enabled = false;
+                //btnPlaceShips.Enabled = false;
                 return;
             }
 
             lblStatus.Text = $"Đặt tàu tiếp theo có độ dài {_shipSizes[_currentShipIndex]}";
         }
+        private void RemoveShip(Ship s)
+        {
+            int idx = _myShips.IndexOf(s);
+            if (idx < 0) return;
+
+            // Xóa từ tàu vừa click đến tàu cuối cùng
+            _myShips.RemoveRange(idx, _myShips.Count - idx);
+
+            // vẽ lại toàn bộ bảng
+            ResetBoards();
+            DrawMyShips();
+
+            _currentShipIndex = idx;
+            _placingShips = true;
+
+            lblStatus.Text = "Đã xóa tàu từ vị trí này trở về sau, hãy đặt lại.";
+        }
+
+
+        private void dgvMyBoard_MouseDown(object? sender, MouseEventArgs e)
+        {
+            if (!_placingShips) return;
+            if (e.Button != MouseButtons.Right) return;
+
+            var hit = dgvMyBoard.HitTest(e.X, e.Y);
+            int row = hit.RowIndex;
+            int col = hit.ColumnIndex;
+
+            if (row < 0 || col < 0) return;
+
+            // tìm tàu chứa ô này
+            Ship? targetShip = null;
+
+            foreach (var s in _myShips)
+            {
+                int dx = s.dir == "H" ? 1 : 0;
+                int dy = s.dir == "V" ? 1 : 0;
+
+                for (int i = 0; i < s.len; i++)
+                {
+                    int xx = s.x + dx * i;
+                    int yy = s.y + dy * i;
+
+                    if (xx == col && yy == row)
+                    {
+                        targetShip = s;
+                        break;
+                    }
+                }
+                if (targetShip != null) break;
+            }
+
+            if (targetShip == null) return;
+
+            // ❗ XÓA TÀU
+            RemoveShip(targetShip);
+
+            lblStatus.Text = "Đã xóa tàu! Bạn có thể đặt lại.";
+        }
+
         private bool CanPlaceShip(int x, int y, int len, string dir)
         {
             int dx = dir == "H" ? 1 : 0;
@@ -186,8 +250,21 @@ namespace BattleshipClientWin
 
             return false;
         }
-        private void DrawShip(Ship s, Color color)
+        private Color[] _shipColors = new[]
+         {
+            Color.LightBlue,   // tàu 5 ô
+            Color.LightGreen,  // tàu 4 ô
+            Color.Orange,      // tàu 3 ô (1)
+            Color.MediumPurple,// tàu 3 ô (2)
+            Color.LightPink    // tàu 2 ô
+        };
+        private void DrawShip(Ship s)
         {
+            int idx = s.colorIndex;
+            if (idx < 0 || idx >= _shipColors.Length) idx = 0; // fallback an toàn
+
+            Color color = _shipColors[idx];
+
             int dx = s.dir == "H" ? 1 : 0;
             int dy = s.dir == "V" ? 1 : 0;
 
@@ -198,6 +275,7 @@ namespace BattleshipClientWin
                 dgvMyBoard.Rows[yy].Cells[xx].Style.BackColor = color;
             }
         }
+
 
         private async void btnConnect_Click(object sender, EventArgs e)
         {
@@ -284,16 +362,11 @@ namespace BattleshipClientWin
         {
             foreach (var s in _myShips)
             {
-                int dx = s.dir == "H" ? 1 : 0;
-                int dy = s.dir == "V" ? 1 : 0;
-                for (int i = 0; i < s.len; i++)
-                {
-                    int xx = s.x + i * dx;
-                    int yy = s.y + i * dy;
-                    dgvMyBoard.Rows[yy].Cells[xx].Style.BackColor = Color.LightBlue;
-                }
+                DrawShip(s);
             }
         }
+
+
 
         private Color GetColorByResult(string result)
         {
@@ -376,6 +449,16 @@ namespace BattleshipClientWin
             byte[] data = Encoding.UTF8.GetBytes(json + "\n");
             await _stream.WriteAsync(data, 0, data.Length);
         }
+
+        private void label1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label3_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 
     public class Ship
@@ -385,14 +468,19 @@ namespace BattleshipClientWin
         public int y { get; set; }
         public string dir { get; set; }
 
-        public Ship(int len, int x, int y, string dir)
+        // thêm thuộc tính màu
+        public int colorIndex { get; set; }
+
+        public Ship(int len, int x, int y, string dir, int colorIndex)
         {
             this.len = len;
             this.x = x;
             this.y = y;
             this.dir = dir;
+            this.colorIndex = colorIndex;
         }
     }
+
 
     public class Message
     {
