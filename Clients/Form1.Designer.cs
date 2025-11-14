@@ -13,104 +13,136 @@
 
         private void InitializeComponent()
         {
-            this.btnConnect = new System.Windows.Forms.Button();
-            this.btnCreate = new System.Windows.Forms.Button();
-            this.btnJoin = new System.Windows.Forms.Button();
-            this.txtRoomId = new System.Windows.Forms.TextBox();
-            this.lblRole = new System.Windows.Forms.Label();
-            this.lblTurn = new System.Windows.Forms.Label();
-            this.lblStatus = new System.Windows.Forms.Label();
-            this.dgvMyBoard = new System.Windows.Forms.DataGridView();
-            this.dgvTarget = new System.Windows.Forms.DataGridView();
-            this.btnPlaceShips = new System.Windows.Forms.Button();
-
-            ((System.ComponentModel.ISupportInitialize)(this.dgvMyBoard)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.dgvTarget)).BeginInit();
-            this.SuspendLayout();
-
+            btnConnect = new Button();
+            btnCreate = new Button();
+            btnJoin = new Button();
+            txtRoomId = new TextBox();
+            lblRole = new Label();
+            lblTurn = new Label();
+            lblStatus = new Label();
+            dgvMyBoard = new DataGridView();
+            dgvTarget = new DataGridView();
+            label1 = new Label();
+            label2 = new Label();
+            ((System.ComponentModel.ISupportInitialize)dgvMyBoard).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)dgvTarget).BeginInit();
+            SuspendLayout();
+            // 
             // btnConnect
-            this.btnConnect.Location = new System.Drawing.Point(12, 12);
-            this.btnConnect.Name = "btnConnect";
-            this.btnConnect.Size = new System.Drawing.Size(94, 29);
-            this.btnConnect.Text = "Connect";
-            this.btnConnect.Click += new System.EventHandler(this.btnConnect_Click);
-
+            // 
+            btnConnect.Location = new Point(12, 12);
+            btnConnect.Name = "btnConnect";
+            btnConnect.Size = new Size(90, 30);
+            btnConnect.TabIndex = 9;
+            btnConnect.Text = "Connect";
+            btnConnect.Click += btnConnect_Click;
+            // 
             // btnCreate
-            this.btnCreate.Location = new System.Drawing.Point(112, 12);
-            this.btnCreate.Name = "btnCreate";
-            this.btnCreate.Size = new System.Drawing.Size(94, 29);
-            this.btnCreate.Text = "Create";
-            this.btnCreate.Click += new System.EventHandler(this.btnCreate_Click);
-
-            // txtRoomId
-            this.txtRoomId.Location = new System.Drawing.Point(212, 12);
-            this.txtRoomId.Name = "txtRoomId";
-            this.txtRoomId.Size = new System.Drawing.Size(194, 27);
-
+            // 
+            btnCreate.Location = new Point(108, 12);
+            btnCreate.Name = "btnCreate";
+            btnCreate.Size = new Size(90, 30);
+            btnCreate.TabIndex = 8;
+            btnCreate.Text = "Create";
+            btnCreate.Click += btnCreate_Click;
+            // 
             // btnJoin
-            this.btnJoin.Location = new System.Drawing.Point(412, 12);
-            this.btnJoin.Name = "btnJoin";
-            this.btnJoin.Size = new System.Drawing.Size(94, 29);
-            this.btnJoin.Text = "Join";
-            this.btnJoin.Click += new System.EventHandler(this.btnJoin_Click);
-
+            // 
+            btnJoin.Location = new Point(370, 12);
+            btnJoin.Name = "btnJoin";
+            btnJoin.Size = new Size(90, 30);
+            btnJoin.TabIndex = 7;
+            btnJoin.Text = "Join";
+            btnJoin.Click += btnJoin_Click;
+            // 
+            // txtRoomId
+            // 
+            txtRoomId.Location = new Point(204, 14);
+            txtRoomId.Name = "txtRoomId";
+            txtRoomId.Size = new Size(160, 23);
+            txtRoomId.TabIndex = 6;
+            // 
             // lblRole
-            this.lblRole.AutoSize = true;
-            this.lblRole.Location = new System.Drawing.Point(12, 52);
-            this.lblRole.Name = "lblRole";
-            this.lblRole.Text = "Role: ???";
-
+            // 
+            lblRole.Location = new Point(12, 55);
+            lblRole.Name = "lblRole";
+            lblRole.Size = new Size(150, 25);
+            lblRole.TabIndex = 5;
+            lblRole.Text = "Role: ???";
+            // 
             // lblTurn
-            this.lblTurn.AutoSize = true;
-            this.lblTurn.Location = new System.Drawing.Point(212, 52);
-            this.lblTurn.Name = "lblTurn";
-            this.lblTurn.Text = "Turn: none";
-
-            // lblStatus  ★★★ NEW ★★★
-            this.lblStatus.AutoSize = true;
-            this.lblStatus.Location = new System.Drawing.Point(412, 52);
-            this.lblStatus.Name = "lblStatus";
-            this.lblStatus.Text = "Status: waiting";
-
+            // 
+            lblTurn.Location = new Point(170, 55);
+            lblTurn.Name = "lblTurn";
+            lblTurn.Size = new Size(150, 25);
+            lblTurn.TabIndex = 4;
+            lblTurn.Text = "Turn: none";
+            // 
+            // lblStatus
+            // 
+            lblStatus.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
+            lblStatus.Location = new Point(330, 55);
+            lblStatus.Name = "lblStatus";
+            lblStatus.Size = new Size(300, 25);
+            lblStatus.TabIndex = 3;
+            lblStatus.Text = "Status: waiting";
+            // 
             // dgvMyBoard
-            this.dgvMyBoard.Location = new System.Drawing.Point(12, 84);
-            this.dgvMyBoard.Size = new System.Drawing.Size(350, 350);
-            this.dgvMyBoard.RowHeadersWidth = 51;
-
+            // 
+            dgvMyBoard.Location = new Point(12, 90);
+            dgvMyBoard.Name = "dgvMyBoard";
+            dgvMyBoard.RowHeadersVisible = false;
+            dgvMyBoard.Size = new Size(350, 350);
+            dgvMyBoard.TabIndex = 2;
+            // 
             // dgvTarget
-            this.dgvTarget.Location = new System.Drawing.Point(412, 84);
-            this.dgvTarget.Size = new System.Drawing.Size(350, 350);
-            this.dgvTarget.RowHeadersWidth = 51;
-            this.dgvTarget.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvTarget_CellClick);
-
-            // btnPlaceShips
-            this.btnPlaceShips.Location = new System.Drawing.Point(512, 12);
-            this.btnPlaceShips.Name = "btnPlaceShips";
-            this.btnPlaceShips.Size = new System.Drawing.Size(94, 29);
-            this.btnPlaceShips.Text = "Place ships";
-            this.btnPlaceShips.Click += new System.EventHandler(this.btnPlaceShips_Click);
-
+            // 
+            dgvTarget.Location = new Point(400, 90);
+            dgvTarget.Name = "dgvTarget";
+            dgvTarget.RowHeadersVisible = false;
+            dgvTarget.Size = new Size(350, 350);
+            dgvTarget.TabIndex = 1;
+            dgvTarget.CellClick += dgvTarget_CellClick;
+            // 
+            // label1
+            // 
+            label1.AutoSize = true;
+            label1.Location = new Point(41, 460);
+            label1.Name = "label1";
+            label1.Size = new Size(61, 15);
+            label1.TabIndex = 10;
+            label1.Text = "cách chơi ";
+            // 
+            // label2
+            // 
+            label2.AutoSize = true;
+            label2.Location = new Point(41, 484);
+            label2.Name = "label2";
+            label2.Size = new Size(331, 15);
+            label2.TabIndex = 11;
+            label2.Text = "Trước khi đặt tàu nhấn R để quy định tàu xoay ngang hay dọc";
+            // 
             // Form1
-            this.ClientSize = new System.Drawing.Size(780, 450);
-            this.Controls.Add(this.btnPlaceShips);
-            this.Controls.Add(this.dgvTarget);
-            this.Controls.Add(this.dgvMyBoard);
-            this.Controls.Add(this.lblStatus);   // ★ Thêm vào Form
-            this.Controls.Add(this.lblTurn);
-            this.Controls.Add(this.lblRole);
-            this.Controls.Add(this.txtRoomId);
-            this.Controls.Add(this.btnJoin);
-            this.Controls.Add(this.btnCreate);
-            this.Controls.Add(this.btnConnect);
-            this.Name = "Form1";
-            this.Text = "Battleship Client";
-
-            ((System.ComponentModel.ISupportInitialize)(this.dgvMyBoard)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.dgvTarget)).EndInit();
-            this.ResumeLayout(false);
-            this.PerformLayout();
+            // 
+            ClientSize = new Size(770, 531);
+            Controls.Add(label2);
+            Controls.Add(label1);
+            Controls.Add(dgvTarget);
+            Controls.Add(dgvMyBoard);
+            Controls.Add(lblStatus);
+            Controls.Add(lblTurn);
+            Controls.Add(lblRole);
+            Controls.Add(txtRoomId);
+            Controls.Add(btnJoin);
+            Controls.Add(btnCreate);
+            Controls.Add(btnConnect);
+            Name = "Form1";
+            Text = "Battleship Client";
+            ((System.ComponentModel.ISupportInitialize)dgvMyBoard).EndInit();
+            ((System.ComponentModel.ISupportInitialize)dgvTarget).EndInit();
+            ResumeLayout(false);
+            PerformLayout();
         }
-
 
         private Button btnConnect;
         private Button btnCreate;
@@ -118,9 +150,11 @@
         private TextBox txtRoomId;
         private Label lblRole;
         private Label lblTurn;
+        private Label lblStatus;
         private DataGridView dgvMyBoard;
         private DataGridView dgvTarget;
         private Button btnPlaceShips;
-        private Label lblStatus;
+        private Label label1;
+        private Label label2;
     }
 }
