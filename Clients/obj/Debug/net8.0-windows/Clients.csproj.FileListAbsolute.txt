@@ -1,0 +1,16 @@
+C:\Users\Lenovo\source\repos\BattleShip\Clients\obj\Debug\net8.0-windows\BattleshipClientWin.Form1.resources
+C:\Users\Lenovo\source\repos\BattleShip\Clients\obj\Debug\net8.0-windows\Clients.csproj.GenerateResource.cache
+C:\Users\Lenovo\source\repos\BattleShip\Clients\obj\Debug\net8.0-windows\Clients.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Lenovo\source\repos\BattleShip\Clients\obj\Debug\net8.0-windows\Clients.AssemblyInfoInputs.cache
+C:\Users\Lenovo\source\repos\BattleShip\Clients\obj\Debug\net8.0-windows\Clients.AssemblyInfo.cs
+C:\Users\Lenovo\source\repos\BattleShip\Clients\obj\Debug\net8.0-windows\Clients.csproj.CoreCompileInputs.cache
+C:\Users\Lenovo\source\repos\BattleShip\Clients\bin\Debug\net8.0-windows\Clients.exe
+C:\Users\Lenovo\source\repos\BattleShip\Clients\bin\Debug\net8.0-windows\Clients.deps.json
+C:\Users\Lenovo\source\repos\BattleShip\Clients\bin\Debug\net8.0-windows\Clients.runtimeconfig.json
+C:\Users\Lenovo\source\repos\BattleShip\Clients\bin\Debug\net8.0-windows\Clients.dll
+C:\Users\Lenovo\source\repos\BattleShip\Clients\bin\Debug\net8.0-windows\Clients.pdb
+C:\Users\Lenovo\source\repos\BattleShip\Clients\obj\Debug\net8.0-windows\Clients.dll
+C:\Users\Lenovo\source\repos\BattleShip\Clients\obj\Debug\net8.0-windows\refint\Clients.dll
+C:\Users\Lenovo\source\repos\BattleShip\Clients\obj\Debug\net8.0-windows\Clients.pdb
+C:\Users\Lenovo\source\repos\BattleShip\Clients\obj\Debug\net8.0-windows\Clients.genruntimeconfig.cache
+C:\Users\Lenovo\source\repos\BattleShip\Clients\obj\Debug\net8.0-windows\ref\Clients.dll
