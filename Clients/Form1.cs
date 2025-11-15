@@ -1,12 +1,13 @@
 using System;
+using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
+using System.Linq.Expressions;
 using System.Net.Sockets;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Drawing;
-using System.Collections.Generic;
 using Timer = System.Windows.Forms.Timer;
 
 namespace BattleshipClientWin
@@ -36,26 +37,68 @@ namespace BattleshipClientWin
         private Timer _explosionTimer = new Timer();
         private List<DataGridViewCell> _explosionCells = new();
         private int _explosionState = 0;
-        
+
 
         public Form1()
         {
             InitializeComponent();
+
             InitGrids();
+
             lblStatus.Text = "Status: waiting for game";
-            this.KeyPreview = true;        // để nhận phím R
-            this.KeyDown += Form1_KeyDown; // nghe nút xoay
+
+            this.KeyPreview = true;
+            this.KeyDown += Form1_KeyDown;
+
             dgvMyBoard.CellClick += dgvMyBoard_CellClick;
             dgvMyBoard.MouseDown += dgvMyBoard_MouseDown;
             dgvMyBoard.CellMouseEnter += dgvMyBoard_CellMouseEnter;
             dgvMyBoard.CellMouseLeave += dgvMyBoard_CellMouseLeave;
+
             dgvTarget.CellMouseEnter += dgvTarget_CellMouseEnter;
             dgvTarget.CellMouseLeave += dgvTarget_CellMouseLeave;
-            _hitAnimTimer.Interval = 100; // tốc độ flash
+
+            _hitAnimTimer.Interval = 100;
             _hitAnimTimer.Tick += HitAnimTimer_Tick;
+
             _explosionTimer.Interval = 80;
             _explosionTimer.Tick += ExplosionTimer_Tick;
 
+            // 🔥 Khi form resize => grid fit lại panel
+            this.Resize += (s, e) =>
+            {
+                FitGridToPanel(dgvMyBoard, panelMyBoard);
+                FitGridToPanel(dgvTarget, panelTarget);
+            };
+        }
+
+        private void FitGridToPanel(DataGridView grid, Panel panel)
+        {
+            int cols = grid.ColumnCount;
+            int rows = grid.RowCount;
+
+            // Mỗi ô phải là hình vuông → lấy size nhỏ nhất
+            int cellSize = Math.Min(panel.Width / cols, panel.Height / rows);
+
+            // Cập nhật kích thước cột
+            foreach (DataGridViewColumn col in grid.Columns)
+                col.Width = cellSize;
+
+            // Cập nhật chiều cao hàng
+            grid.RowTemplate.Height = cellSize;
+            foreach (DataGridViewRow r in grid.Rows)
+                r.Height = cellSize;
+
+            // Resize grid để vừa panel
+            grid.Width = cellSize * cols;
+            grid.Height = cellSize * rows;
+
+            // Canh giữa panel
+            grid.Left = (panel.Width - grid.Width) / 2;
+            grid.Top = (panel.Height - grid.Height) / 2;
+
+            // Không scroll
+            grid.ScrollBars = ScrollBars.None;
         }
 
         private void InitGrids()
@@ -65,61 +108,49 @@ namespace BattleshipClientWin
             dgvMyBoard.RowCount = 10;
             dgvTarget.RowCount = 10;
 
-            // ❌ Không cho resize hàng/cột
+            // Fit ngay khi load
+            FitGridToPanel(dgvMyBoard, panelMyBoard);
+            FitGridToPanel(dgvTarget, panelTarget);
+
             dgvMyBoard.AllowUserToResizeColumns = false;
             dgvMyBoard.AllowUserToResizeRows = false;
             dgvTarget.AllowUserToResizeColumns = false;
             dgvTarget.AllowUserToResizeRows = false;
 
-            // ❌ Không cho reorder cột
             dgvMyBoard.AllowUserToOrderColumns = false;
             dgvTarget.AllowUserToOrderColumns = false;
 
-            // ❌ Không cho chọn nguyên dòng/nguyên cột
+            dgvMyBoard.ReadOnly = true;
+            dgvTarget.ReadOnly = true;
+
             dgvMyBoard.SelectionMode = DataGridViewSelectionMode.CellSelect;
             dgvTarget.SelectionMode = DataGridViewSelectionMode.CellSelect;
 
-            // ❌ Không cho kéo scroll header (header đã ẩn rồi)
             dgvMyBoard.RowHeadersVisible = false;
             dgvTarget.RowHeadersVisible = false;
             dgvMyBoard.ColumnHeadersVisible = false;
             dgvTarget.ColumnHeadersVisible = false;
 
-            // ❌ Không thể sửa ô
-            dgvMyBoard.ReadOnly = true;
-            dgvTarget.ReadOnly = true;
-
-            // ❌ Không cho multi-select
             dgvMyBoard.MultiSelect = false;
             dgvTarget.MultiSelect = false;
 
-            // Khi click vào ô -> không highlight xanh
             dgvMyBoard.DefaultCellStyle.SelectionBackColor = Color.Transparent;
             dgvMyBoard.DefaultCellStyle.SelectionForeColor = Color.Transparent;
+
             dgvTarget.DefaultCellStyle.SelectionBackColor = Color.Transparent;
             dgvTarget.DefaultCellStyle.SelectionForeColor = Color.Transparent;
-
-            // Đặt size ô
-            foreach (DataGridViewColumn col in dgvMyBoard.Columns) col.Width = 40;
-            foreach (DataGridViewColumn col in dgvTarget.Columns) col.Width = 40;
-
-            dgvMyBoard.RowTemplate.Height = 30;
-            dgvTarget.RowTemplate.Height = 30;
-
-            ResetBoards();
         }
+
+
 
 
         private void ResetBoards()
         {
-            foreach (DataGridViewRow r in dgvMyBoard.Rows)
-                foreach (DataGridViewCell c in r.Cells)
-                    c.Style.BackColor = Color.White;
-
-            foreach (DataGridViewRow r in dgvTarget.Rows)
-                foreach (DataGridViewCell c in r.Cells)
-                    c.Style.BackColor = Color.White;
+            foreach (DataGridViewRow row in dgvMyBoard.Rows)
+                foreach (DataGridViewCell cell in row.Cells)
+                    cell.Style.BackColor = Color.White;
         }
+
 
         private void Form1_KeyDown(object? sender, KeyEventArgs e)
         {
@@ -176,8 +207,10 @@ namespace BattleshipClientWin
             // Xóa từ tàu vừa click đến tàu cuối cùng
             _myShips.RemoveRange(idx, _myShips.Count - idx);
 
-            // vẽ lại toàn bộ bảng
-            ResetBoards();
+            // Chỉ reset lại bảng của mình, không đụng bảng target
+            foreach (DataGridViewRow row in dgvMyBoard.Rows)
+                foreach (DataGridViewCell cell in row.Cells)
+                    cell.Style.BackColor = Color.White;
             DrawMyShips();
 
             _currentShipIndex = idx;
