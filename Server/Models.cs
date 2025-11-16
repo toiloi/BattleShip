@@ -71,6 +71,15 @@ public class GameRoom
         if (Player1 == null || Player2 == null) return null;
         return p == Player1 ? Player2 : Player1;
     }
+
+    public void RemovePlayer(PlayerConn p)
+{
+    if (Player1 == p) Player1 = null;
+    else if (Player2 == p) Player2 = null;
+    IsPlaying = false;
+}
+
+    public bool IsEmpty => Player1 == null && Player2 == null;
 }
 
 public class Board

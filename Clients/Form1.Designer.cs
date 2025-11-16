@@ -73,6 +73,16 @@
             this.lblStatus.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
             this.lblStatus.Text = "Status: waiting for game";
 
+            // btnLeave
+            this.btnLeave = new Button();
+            this.btnLeave.Location = new Point( /* ví dụ: */ 560, 12);
+            this.btnLeave.Size = new Size(90, 30);
+            this.btnLeave.Name = "btnLeave";
+            this.btnLeave.Text = "Leave";
+            this.btnLeave.UseVisualStyleBackColor = true;
+            this.btnLeave.Click += btnLeave_Click;
+            this.Controls.Add(this.btnLeave);
+
             // ======================
             //  PANELS
             // ======================
@@ -152,6 +162,7 @@
         private Button btnConnect;
         private Button btnCreate;
         private Button btnJoin;
+        private Button btnLeave;
         private TextBox txtRoomId;
         private Label lblRole;
         private Label lblTurn;

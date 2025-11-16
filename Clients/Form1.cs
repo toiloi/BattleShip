@@ -38,6 +38,57 @@ namespace BattleshipClientWin
         private List<ExplosionCell> _explosionCells = new();
         private int _explosionState = 0;
         private HashSet<Point> _hitShipCells = new();
+        // --- LƯU VẾT BẮN (không đụng hiệu ứng hiện có) ---
+        private enum CellState { Unknown, Miss, Hit, Sunk }
+        private readonly CellState[,] _stateMy = new CellState[10,10];
+        private readonly CellState[,] _stateTarget = new CellState[10,10];
+
+        private static CellState ToState(string? r) =>
+            r == "MISS" ? CellState.Miss :
+            r == "HIT"  ? CellState.Hit  :
+            r == "SUNK" ? CellState.Sunk : CellState.Unknown;
+
+        // Phủ lại lớp vết bắn lên màu hiện có (tôn trọng màu tàu/ghost/animation của bạn)
+        private void ReapplyShotStateOverlay()
+        {
+            for (int y = 0; y < 10; y++)
+            for (int x = 0; x < 10; x++)
+            {
+                // target (phải)
+                var t = _stateTarget[y, x];
+                if (t == CellState.Miss) dgvTarget.Rows[y].Cells[x].Style.BackColor = Color.LightGray;
+                else if (t == CellState.Hit) dgvTarget.Rows[y].Cells[x].Style.BackColor = Color.Red;
+                else if (t == CellState.Sunk) dgvTarget.Rows[y].Cells[x].Style.BackColor = Color.DarkRed;
+
+                // my (trái)
+                var m = _stateMy[y, x];
+                if (m == CellState.Miss) dgvMyBoard.Rows[y].Cells[x].Style.BackColor = Color.LightGray;
+                else if (m == CellState.Hit) dgvMyBoard.Rows[y].Cells[x].Style.BackColor = Color.Red;
+                else if (m == CellState.Sunk) dgvMyBoard.Rows[y].Cells[x].Style.BackColor = Color.DarkRed;
+            }
+        }
+
+        // Xoá sạch vết bắn & phủ lại (dùng khi leave/room mới)
+        private void ClearBoardsStateAndRepaint()
+        {
+            // 1) Xoá state vết bắn
+            Array.Clear(_stateMy, 0, _stateMy.Length);
+            Array.Clear(_stateTarget, 0, _stateTarget.Length);
+
+            // 2) Reset màu trắng toàn bộ HAI bảng (xử lý triệt để phần còn lưu màu)
+            for (int y = 0; y < 10; y++)
+            {
+                for (int x = 0; x < 10; x++)
+                {
+                    dgvMyBoard.Rows[y].Cells[x].Style.BackColor = System.Drawing.Color.White;
+                    dgvTarget.Rows[y].Cells[x].Style.BackColor = System.Drawing.Color.White;
+                }
+            }
+
+            // 3) Nếu bạn giữ tàu khi đang ở trong ván, hãy vẽ lại tàu ở ngoài hàm này
+            //    (Hàm này dùng cho LEAVE/room mới nên không vẽ gì thêm ở đây)
+        }
+
 
         public Form1()
         {
@@ -406,10 +457,34 @@ namespace BattleshipClientWin
                     lblStatus.Text = "Status: GAME STARTED";
                     ResetBoards();
                     DrawMyShips();
+
+                    // ✨ xoá vết bắn cũ & phủ lại (trắng hết)
+                    Array.Clear(_stateMy, 0, _stateMy.Length);
+                    Array.Clear(_stateTarget, 0, _stateTarget.Length);
+                    ReapplyShotStateOverlay();
                     break;
 
                 case "FIRE_RESULT":
+                    // GIỮ nguyên hiệu ứng của bạn
                     PaintFireResult(msg);
+
+                    // ✨ LƯU vết bắn bền vững
+                    bool iFired = (msg.from == _myRole);
+                    var st = ToState(msg.result);
+                    if (iFired) _stateTarget[msg.y, msg.x] = st;  // mình bắn -> lưới phải
+                    else        _stateMy[msg.y, msg.x]     = st;  // đối thủ bắn -> lưới trái
+
+                    // ✨ Sau khi hiệu ứng chạy, phủ lại lớp vết bắn để KHÔNG mất dấu
+                    var overlayTimer = new Timer();
+                    overlayTimer.Interval = 250; // chỉnh khớp với _hitAnimTimer/_explosionTimer của bạn
+                    overlayTimer.Tick += (s, e2) =>
+                    {
+                        overlayTimer.Stop();
+                        overlayTimer.Dispose();
+                        ReapplyShotStateOverlay();
+                    };
+                    overlayTimer.Start();
+
                     _currentTurn = msg.nextTurn ?? "";
                     lblTurn.Text = "Turn: " + (_currentTurn == "" ? "-" : _currentTurn);
                     lblStatus.Text = "Status: shot fired";
@@ -419,7 +494,31 @@ namespace BattleshipClientWin
                     lblStatus.Text = "Winner: " + msg.winner;
                     MessageBox.Show("Winner: " + msg.winner);
                     break;
+                case "LEFT_OK":
+                    _currentTurn = "";
+                    lblTurn.Text = "Turn: -";
+                    lblRole.Text = "Role: -";
+                    lblStatus.Text = "Status: you left the room";
+                    ClearBoardsStateAndRepaint();   // xoá vết bắn & phủ lại
+                    ResetBoards();                  // bảng trái trắng (tàu sẽ đặt lại khi vào phòng khác)
+                    _myShips.Clear();
+                    _placingShips = true;
+                    _currentShipIndex = 0;
+                    break;
+
+                case "OPP_LEFT":
+                    _currentTurn = "";
+                    lblTurn.Text = "Turn: -";
+                    lblStatus.Text = "Status: opponent left";
+                    MessageBox.Show("Đối thủ đã rời phòng.");
+                    break;
             }
+        }
+
+        private async void btnLeave_Click(object sender, EventArgs e)
+        {
+            if (_stream == null) return;
+            await SendAsync(new { type = "LEAVE_ROOM" });
         }
 
         private void DrawMyShips()
