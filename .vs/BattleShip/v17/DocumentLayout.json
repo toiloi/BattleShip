@@ -7,7 +7,7 @@
       "RelativeMoniker": "D:0:0:{12856E50-4A55-4DF3-B114-7EE5ECA7D5CD}|Clients\\Clients.csproj|solutionrelative:clients\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{12856E50-4A55-4DF3-B114-7EE5ECA7D5CD}|Clients\\Clients.csproj|c:\\users\\admin\\desktop\\battleshi\\battleship\\clients\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
+      "AbsoluteMoniker": "D:0:0:{12856E50-4A55-4DF3-B114-7EE5ECA7D5CD}|Clients\\Clients.csproj|C:\\Users\\ADMIN\\Desktop\\battleshi\\BattleShip\\clients\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
       "RelativeMoniker": "D:0:0:{12856E50-4A55-4DF3-B114-7EE5ECA7D5CD}|Clients\\Clients.csproj|solutionrelative:clients\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
     }
   ],
@@ -28,7 +28,7 @@
               "RelativeDocumentMoniker": "Clients\\Form1.cs",
               "ToolTip": "C:\\Users\\ADMIN\\Desktop\\battleshi\\BattleShip\\Clients\\Form1.cs",
               "RelativeToolTip": "Clients\\Form1.cs",
-              "ViewState": "AgIAAJgAAAAAAAAAAAAnwEYBAAArAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAAlAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-11-16T07:45:08.772Z",
               "EditorCaption": ""
@@ -42,8 +42,7 @@
               "ToolTip": "C:\\Users\\ADMIN\\Desktop\\battleshi\\BattleShip\\Clients\\Form1.cs [Design]",
               "RelativeToolTip": "Clients\\Form1.cs [Design]",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-16T07:45:07.04Z",
-              "EditorCaption": " [Design]"
+              "WhenOpened": "2025-11-16T07:45:07.04Z"
             }
           ]
         }
