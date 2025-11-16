@@ -35,9 +35,9 @@ namespace BattleshipClientWin
         private Color _animColor2;
         private Color _animFinal;
         private Timer _explosionTimer = new Timer();
-        private List<DataGridViewCell> _explosionCells = new();
+        private List<ExplosionCell> _explosionCells = new();
         private int _explosionState = 0;
-
+        private HashSet<Point> _hitShipCells = new();
 
         public Form1()
         {
@@ -317,7 +317,7 @@ namespace BattleshipClientWin
         private void DrawShip(Ship s)
         {
             int idx = s.colorIndex;
-            if (idx < 0 || idx >= _shipColors.Length) idx = 0; // fallback an toàn
+            if (idx < 0 || idx >= _shipColors.Length) idx = 0;
 
             Color color = _shipColors[idx];
 
@@ -328,9 +328,17 @@ namespace BattleshipClientWin
             {
                 int xx = s.x + dx * i;
                 int yy = s.y + dy * i;
-                dgvMyBoard.Rows[yy].Cells[xx].Style.BackColor = color;
+
+                var cell = dgvMyBoard.Rows[yy].Cells[xx];
+
+                // Nếu ô này đã bị bắn → tô màu đỏ cố định
+                if (_hitShipCells.Contains(new Point(xx, yy)))
+                    cell.Style.BackColor = Color.Red;
+                else
+                    cell.Style.BackColor = color;
             }
         }
+
 
 
         private async void btnConnect_Click(object sender, EventArgs e)
@@ -434,6 +442,7 @@ namespace BattleshipClientWin
                 _ => Color.White
             };
         }
+        
 
         private void PaintFireResult(Message msg)
         {
@@ -446,6 +455,14 @@ namespace BattleshipClientWin
 
             // Animation HIT/MISS/SUNK
             AnimateCell(cell, msg.result!);
+            if (!isMyShot && msg.result == "HIT")
+            {
+                _hitShipCells.Add(new Point(msg.x, msg.y));
+            }
+            if (!isMyShot && msg.result == "SUNK")
+            {
+                _hitShipCells.Add(new Point(msg.x, msg.y));
+            }
 
             // 💥 Explosion wave hiệu ứng lan
             if (msg.result == "HIT" || msg.result == "SUNK")
@@ -685,19 +702,21 @@ namespace BattleshipClientWin
             int[] dx = { -1, 0, 1 };
             int[] dy = { -1, 0, 1 };
 
-            // Lấy 8 ô xung quanh
             foreach (int ox in dx)
             {
                 foreach (int oy in dy)
                 {
-                    if (ox == 0 && oy == 0) continue; // bỏ ô tâm
+                    if (ox == 0 && oy == 0) continue;
 
                     int xx = x + ox;
                     int yy = y + oy;
 
                     if (xx >= 0 && xx < 10 && yy >= 0 && yy < 10)
                     {
-                        _explosionCells.Add(grid.Rows[yy].Cells[xx]);
+                        var cell = grid.Rows[yy].Cells[xx];
+
+                        // LƯU MÀU GỐC
+                        _explosionCells.Add(new ExplosionCell(cell, cell.Style.BackColor));
                     }
                 }
             }
@@ -706,6 +725,18 @@ namespace BattleshipClientWin
         }
 
 
+        class ExplosionCell
+        {
+            public DataGridViewCell Cell;
+            public Color OriginalColor;
+
+            public ExplosionCell(DataGridViewCell c, Color col)
+            {
+                Cell = c;
+                OriginalColor = col;
+            }
+        }
+
         private void ExplosionTimer_Tick(object? sender, EventArgs e)
         {
             _explosionState++;
@@ -713,25 +744,22 @@ namespace BattleshipClientWin
             Color c1 = Color.Gold;
             Color c2 = Color.OrangeRed;
 
-            // nháy 4 lần
-            foreach (var cell in _explosionCells)
+            foreach (var ex in _explosionCells)
             {
-                if (_explosionState % 2 == 0)
-                    cell.Style.BackColor = c1;
-                else
-                    cell.Style.BackColor = c2;
+                ex.Cell.Style.BackColor = (_explosionState % 2 == 0) ? c1 : c2;
             }
 
             if (_explosionState > 4)
             {
                 _explosionTimer.Stop();
-                // trả màu về cũ (trắng)
-                foreach (var cell in _explosionCells)
-                    cell.Style.BackColor = Color.White;
+
+                foreach (var ex in _explosionCells)
+                    ex.Cell.Style.BackColor = ex.OriginalColor;  // trả về màu gốc
             }
         }
 
-       
+
+
 
     }
 
