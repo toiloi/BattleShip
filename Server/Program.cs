@@ -141,12 +141,36 @@ static async Task HandleClient(TcpClient client, RoomManager roomManager)
 
                         break;
                     }
+                case "LEAVE_ROOM":
+                    {
+                        if (currentRoom != null)
+                        {
+                            try { await Broadcast(currentRoom, new { type = "OPP_LEFT", roomId = currentRoom.RoomId }); } catch { }
+                            currentRoom.RemovePlayer(player);
+                            await player.SendAsync(new { type = "LEFT_OK", roomId = currentRoom.RoomId });
+                            await BroadcastRoomStatus(currentRoom);
+                            currentRoom = null;
+                        }
+                        break;
+                    }
+                
             }
         }
     }
     catch (Exception ex)
     {
         Console.WriteLine("Client error: " + ex.Message);
+    }
+    finally
+    {
+        if (currentRoom != null)
+        {
+            try { await Broadcast(currentRoom, new { type = "OPP_LEFT", roomId = currentRoom.RoomId }); } catch { }
+            currentRoom.RemovePlayer(player);
+            await BroadcastRoomStatus(currentRoom);
+            currentRoom = null;
+        }
+        try { client.Close(); } catch { }
     }
 }
 
