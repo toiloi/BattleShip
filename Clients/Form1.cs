@@ -38,37 +38,35 @@ namespace BattleshipClientWin
         private List<ExplosionCell> _explosionCells = new();
         private int _explosionState = 0;
         private HashSet<Point> _hitShipCells = new();
-        // --- LƯU VẾT BẮN (không đụng hiệu ứng hiện có) ---
+
         private enum CellState { Unknown, Miss, Hit, Sunk }
-        private readonly CellState[,] _stateMy = new CellState[10,10];
-        private readonly CellState[,] _stateTarget = new CellState[10,10];
+        private readonly CellState[,] _stateMy = new CellState[10, 10];
+        private readonly CellState[,] _stateTarget = new CellState[10, 10];
 
         private static CellState ToState(string? r) =>
             r == "MISS" ? CellState.Miss :
-            r == "HIT"  ? CellState.Hit  :
+            r == "HIT" ? CellState.Hit :
             r == "SUNK" ? CellState.Sunk : CellState.Unknown;
 
-        // Phủ lại lớp vết bắn lên màu hiện có (tôn trọng màu tàu/ghost/animation của bạn)
         private void ReapplyShotStateOverlay()
         {
             for (int y = 0; y < 10; y++)
-            for (int x = 0; x < 10; x++)
-            {
-                // target (phải)
-                var t = _stateTarget[y, x];
-                if (t == CellState.Miss) dgvTarget.Rows[y].Cells[x].Style.BackColor = Color.LightGray;
-                else if (t == CellState.Hit) dgvTarget.Rows[y].Cells[x].Style.BackColor = Color.Red;
-                else if (t == CellState.Sunk) dgvTarget.Rows[y].Cells[x].Style.BackColor = Color.DarkRed;
+                for (int x = 0; x < 10; x++)
+                {
+                    // target (phải)
+                    var t = _stateTarget[y, x];
+                    if (t == CellState.Miss) dgvTarget.Rows[y].Cells[x].Style.BackColor = Color.LightGray;
+                    else if (t == CellState.Hit) dgvTarget.Rows[y].Cells[x].Style.BackColor = Color.Red;
+                    else if (t == CellState.Sunk) dgvTarget.Rows[y].Cells[x].Style.BackColor = Color.DarkRed;
 
-                // my (trái)
-                var m = _stateMy[y, x];
-                if (m == CellState.Miss) dgvMyBoard.Rows[y].Cells[x].Style.BackColor = Color.LightGray;
-                else if (m == CellState.Hit) dgvMyBoard.Rows[y].Cells[x].Style.BackColor = Color.Red;
-                else if (m == CellState.Sunk) dgvMyBoard.Rows[y].Cells[x].Style.BackColor = Color.DarkRed;
-            }
+                    // my (trái)
+                    var m = _stateMy[y, x];
+                    if (m == CellState.Miss) dgvMyBoard.Rows[y].Cells[x].Style.BackColor = Color.LightGray;
+                    else if (m == CellState.Hit) dgvMyBoard.Rows[y].Cells[x].Style.BackColor = Color.Red;
+                    else if (m == CellState.Sunk) dgvMyBoard.Rows[y].Cells[x].Style.BackColor = Color.DarkRed;
+                }
         }
 
-        // Xoá sạch vết bắn & phủ lại (dùng khi leave/room mới)
         private void ClearBoardsStateAndRepaint()
         {
             // 1) Xoá state vết bắn
@@ -88,7 +86,6 @@ namespace BattleshipClientWin
             // 3) Nếu bạn giữ tàu khi đang ở trong ván, hãy vẽ lại tàu ở ngoài hàm này
             //    (Hàm này dùng cho LEAVE/room mới nên không vẽ gì thêm ở đây)
         }
-
 
         public Form1()
         {
@@ -192,16 +189,12 @@ namespace BattleshipClientWin
             dgvTarget.DefaultCellStyle.SelectionForeColor = Color.Transparent;
         }
 
-
-
-
         private void ResetBoards()
         {
             foreach (DataGridViewRow row in dgvMyBoard.Rows)
                 foreach (DataGridViewCell cell in row.Cells)
                     cell.Style.BackColor = Color.White;
         }
-
 
         private void Form1_KeyDown(object? sender, KeyEventArgs e)
         {
@@ -213,6 +206,7 @@ namespace BattleshipClientWin
                 lblStatus.Text = $"Xoay hướng: {(_shipDir == "H" ? "Ngang" : "Dọc")}";
             }
         }
+
         private void dgvMyBoard_CellClick(object sender, DataGridViewCellEventArgs e)
         {
             if (!_placingShips) return;
@@ -250,6 +244,7 @@ namespace BattleshipClientWin
 
             lblStatus.Text = $"Đặt tàu tiếp theo có độ dài {_shipSizes[_currentShipIndex]}";
         }
+
         private void RemoveShip(Ship s)
         {
             int idx = _myShips.IndexOf(s);
@@ -269,7 +264,6 @@ namespace BattleshipClientWin
 
             lblStatus.Text = "Đã xóa tàu từ vị trí này trở về sau, hãy đặt lại.";
         }
-
 
         private void dgvMyBoard_MouseDown(object? sender, MouseEventArgs e)
         {
@@ -332,6 +326,7 @@ namespace BattleshipClientWin
 
             return true;
         }
+
         private bool ShipOverlap(Ship s, int x, int y, int len, string dir)
         {
             int dx1 = s.dir == "H" ? 1 : 0;
@@ -357,6 +352,7 @@ namespace BattleshipClientWin
 
             return false;
         }
+
         private Color[] _shipColors = new[]
          {
             Color.LightBlue,   // tàu 5 ô
@@ -365,6 +361,7 @@ namespace BattleshipClientWin
             Color.MediumPurple,// tàu 3 ô (2)
             Color.LightPink    // tàu 2 ô
         };
+
         private void DrawShip(Ship s)
         {
             int idx = s.colorIndex;
@@ -389,8 +386,6 @@ namespace BattleshipClientWin
                     cell.Style.BackColor = color;
             }
         }
-
-
 
         private async void btnConnect_Click(object sender, EventArgs e)
         {
@@ -472,7 +467,7 @@ namespace BattleshipClientWin
                     bool iFired = (msg.from == _myRole);
                     var st = ToState(msg.result);
                     if (iFired) _stateTarget[msg.y, msg.x] = st;  // mình bắn -> lưới phải
-                    else        _stateMy[msg.y, msg.x]     = st;  // đối thủ bắn -> lưới trái
+                    else _stateMy[msg.y, msg.x] = st;  // đối thủ bắn -> lưới trái
 
                     // ✨ Sau khi hiệu ứng chạy, phủ lại lớp vết bắn để KHÔNG mất dấu
                     var overlayTimer = new Timer();
@@ -529,8 +524,6 @@ namespace BattleshipClientWin
             }
         }
 
-
-
         private Color GetColorByResult(string result)
         {
             return result switch
@@ -541,7 +534,6 @@ namespace BattleshipClientWin
                 _ => Color.White
             };
         }
-        
 
         private void PaintFireResult(Message msg)
         {
@@ -576,7 +568,6 @@ namespace BattleshipClientWin
             }
         }
 
-
         private async void btnCreate_Click(object sender, EventArgs e)
         {
             if (!_connected || _stream == null) return;
@@ -591,7 +582,6 @@ namespace BattleshipClientWin
             await SendAsync(new { type = "JOIN_ROOM", roomId = txtRoomId.Text.Trim() });
         }
 
-
         private void ClearPreview()
         {
             foreach (var p in _previewCells)
@@ -601,6 +591,7 @@ namespace BattleshipClientWin
             _previewCells.Clear();
             DrawMyShips(); // vẽ lại tàu cũ
         }
+
         private void ShowPreview(int x, int y)
         {
             ClearPreview();
@@ -624,6 +615,7 @@ namespace BattleshipClientWin
                 _previewCells.Add(new Point(xx, yy));
             }
         }
+
         private void dgvMyBoard_CellMouseEnter(object? sender, DataGridViewCellEventArgs e)
         {
             if (!_placingShips) return;
@@ -631,6 +623,7 @@ namespace BattleshipClientWin
 
             ShowPreview(e.ColumnIndex, e.RowIndex);
         }
+
         private void dgvMyBoard_CellMouseLeave(object? sender, DataGridViewCellEventArgs e)
         {
             if (!_placingShips) return;
@@ -651,9 +644,10 @@ namespace BattleshipClientWin
             }
 
             await SendAsync(new { type = "FIRE", x = e.ColumnIndex, y = e.RowIndex });
-            ClearPreview();  
+            ClearPreview();
 
         }
+
         private void dgvTarget_CellMouseEnter(object? sender, DataGridViewCellEventArgs e)
         {
             if (e.RowIndex < 0 || e.ColumnIndex < 0) return;
@@ -683,6 +677,7 @@ namespace BattleshipClientWin
             // preview màu vàng bình thường
             cell.Style.BackColor = Color.Khaki;
         }
+
         private void dgvTarget_CellMouseLeave(object? sender, DataGridViewCellEventArgs e)
         {
             if (_lastHoverX < 0 || _lastHoverY < 0) return;
@@ -730,6 +725,7 @@ namespace BattleshipClientWin
                 _animCell = null;
             }
         }
+
         private void AnimateCell(DataGridViewCell cell, string result)
         {
             _animCell = cell;
@@ -777,6 +773,7 @@ namespace BattleshipClientWin
             }
             return null;
         }
+
         private void HighlightSunkShip(Ship s)
         {
             int dx = s.dir == "H" ? 1 : 0;
@@ -791,7 +788,6 @@ namespace BattleshipClientWin
                 AnimateCell(cell, "SUNK");
             }
         }
-
 
         private void StartExplosionWave(DataGridView grid, int x, int y)
         {
@@ -822,7 +818,6 @@ namespace BattleshipClientWin
 
             _explosionTimer.Start();
         }
-
 
         class ExplosionCell
         {
@@ -857,9 +852,15 @@ namespace BattleshipClientWin
             }
         }
 
+        private void label4_Click(object sender, EventArgs e)
+        {
 
+        }
 
+        private void label5_Click(object sender, EventArgs e)
+        {
 
+        }
     }
 
     public class Ship
